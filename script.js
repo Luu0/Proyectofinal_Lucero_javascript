@@ -1,10 +1,25 @@
 let carrito =JSON.parse(localStorage.getItem("carrito")) || [];
 let resultado = 0
 let totalCarrito = document.getElementById("total");
+let data="";
+
+Swal.fire({
+  title: 'Bienvenido de vuelta',
+  confirmButtonText: 'Continuar'
+})
+
+
+const getpruducts = async()=>{
+  const response = await fetch("productos.json");
+   data = await response.json();
+  
+  renderizarprod(data)
+};
+getpruducts();
 
 
 //primer renderizado
-renderizarprod(Productos);
+renderizarprod(data);
 if(carrito.length!=0){
   for(const prod of carrito){
     document.getElementById("tablacarrito").innerHTML +=`
@@ -24,9 +39,11 @@ if(carrito.length!=0){
   `;
 }
 
-//Renderizar los productos
-function renderizarprod(Productos){
-  for (const producto of Productos){
+
+
+// Renderizar los productos
+function renderizarprod(productos){
+  for (const producto of productos){
     document.getElementById("contenidotienda").innerHTML +=`
     <div class="col-4">
       <div class="card mt-4" style="width: 26rem;">
@@ -43,11 +60,18 @@ function renderizarprod(Productos){
     let botones = document.getElementsByClassName("compra");
 
     for (const boton of botones){
-
       // PARA AGREGAR PRODUCTOS AL CARRO     
       boton.onclick = () =>{
-        const prodACarro = Productos.find((producto) => producto.id == boton.id);
+        const prodACarro = data.find((producto) => producto.id == boton.id);
         agregarACarrito(prodACarro);
+
+        Toastify({
+          text: "Añadido al carro",
+          duration: 2000,
+          style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+          }
+        }).showToast();
       }
     }
   } 
@@ -95,17 +119,24 @@ function agregarACarrito(producto){
   localStorage.setItem("carrito",JSON.stringify(carrito));
 }
 
+//success
 
 //boton de compra
 const btncompra = document.getElementById("pagar");
 
 btncompra.onclick = () =>{
-  alert("Gracias por tu compra!");
+  
+  Swal.fire({
+    icon: 'success',
+    title: 'Compra Realizada!',
+    confirmButtonText: 'Genial!'
+
+  })
 
   carrito = [];
   tablaCarrito.innerHTML="" 
   resultado= 0;
   totalCarrito.innerText="Total a pagar $:";
   localStorage.removeItem("carrito");
-
 }
+
